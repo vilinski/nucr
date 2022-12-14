@@ -1,8 +1,15 @@
 [package]
 name = "nucr"
 version = "0.1.0"
+authors = ["Andreas Vilinski<vilinski@yahoo.de>"]
 edition = "2021"
+description = "NuGet Credentials utility. Replaces `CI_ARTIFACTORY_USER` and `CI_ARTIFACTORY_USER_PASS` placeholders in NuGet.Conf and NuGet.Conf.Debug with your credentials and saves them securely for reuse"
+readme = "README.md"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+anyhow = "1.0.66"
+rpassword = "7.2.0"
+"keyring" = "1.2.0"
+clap = { version = "4.0.29", features = ["derive"] }

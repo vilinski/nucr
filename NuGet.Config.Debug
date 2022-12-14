@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+  <packageSources>
+    <clear />
+    <add key="corp-qa" value="https://jfrog.mycorp.com/artifactory/api/nuget/qa" />
+  </packageSources>
+  <packageSourceCredentials>
+    <corp-qa>
+      <add key="Username" value="#CI_USER#" />
+      <add key="ClearTextPassword" value="#CI_USER_PASSWORD#" />
+    </corp-qa>
+  </packageSourceCredentials>
+</configuration>
