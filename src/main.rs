@@ -22,7 +22,7 @@ fn read_file(path: &str) -> anyhow::Result<String, Error> {
 
 /// prompt for a value or password
 fn prompt(name: &str, shadowed: bool) -> anyhow::Result<String, Error> {
-    print!("{}: ", name);
+    print!("{name}: ");
     std::io::stdout().flush().unwrap();
 
     if shadowed {
@@ -36,17 +36,16 @@ fn prompt(name: &str, shadowed: bool) -> anyhow::Result<String, Error> {
     }
 }
 
-/// reads or asks and saves the value for CI_USER or CI_USER_PASS to users key chain
+/// reads or asks and saves the value for `CI_USER` or `CI_USER_PASS` to users key chain
 fn get_or_set(username: &str, shadowed: bool) -> anyhow::Result<String, Error> {
-    let entry = keyring::Entry::new("nucr", &username);
+    let entry = keyring::Entry::new("nucr", username)?;
     let p = entry.get_password();
-    match p {
-        Ok(p) => Ok(p),
-        Err(_) => {
-            let value = prompt(username, shadowed)?;
-            entry.set_password(&value)?;
-            Ok(value)
-        }
+    if let Ok(p) = p {
+        Ok(p)
+    } else {
+        let value = prompt(username, shadowed)?;
+        entry.set_password(&value)?;
+        Ok(value)
     }
 }
 
@@ -70,12 +69,12 @@ enum Commands {
 
 fn forget() -> Result<(), Error> {
     for name in &["CI_USER", "CI_USER_PASSWORD"] {
-        let entry = keyring::Entry::new("nucr", &name);
-        if let Ok(_) = entry.get_password() {
+        let entry = keyring::Entry::new("nucr", name)?;
+        if entry.get_password().is_ok() {
             entry.delete_password()?;
-            println!("{} deleted", name);
+            println!("{name} deleted");
         } else {
-            println!("{} not found", name);
+            println!("{name} not found");
         }
     }
     Ok(())
@@ -88,11 +87,11 @@ fn replace(path: &str) -> Result<(), Error> {
     let new_data = nuget_config
         .replace(CI_USER, &user)
         .replace(CI_USER_PASS, &pass);
-    if nuget_config != new_data {
-        fs::write(path, new_data)?;
-        println!("Credentials are set to {}", path);
+    if nuget_config == new_data {
+        println!("Credentials are already set to {path}");
     } else {
-        println!("Credentials are already set to {}", path);
+        fs::write(path, new_data)?;
+        println!("Credentials are set to {path}");
     };
     Ok(())
 }
@@ -104,11 +103,11 @@ fn undo(path: &str) -> Result<(), Error> {
     let new_data = nuget_config
         .replace(&*user, CI_USER)
         .replace(&*pass, CI_USER_PASS);
-    if nuget_config != new_data {
-        fs::write(path, new_data)?;
-        println!("Credentials are removed from {}", path);
+    if nuget_config == new_data {
+        println!("No credentials to remove from {path}");
     } else {
-        println!("No credentials to remove from {}", path);
+        fs::write(path, new_data)?;
+        println!("Credentials are removed from {path}");
     };
     Ok(())
 }
@@ -117,7 +116,7 @@ mod tests {
 
     #[test]
     fn test_get_or_set_var() {
-        let entry = keyring::Entry::new("unittest_nucr", "CI_USER");
+        let entry = keyring::Entry::new("unittest_nucr", "CI_USER").unwrap();
         let p = entry.get_password();
         if p.is_ok() {
             entry.delete_password().unwrap();
