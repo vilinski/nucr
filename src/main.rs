@@ -1,5 +1,6 @@
 use anyhow::{Context, Error, ensure};
 use clap::{Parser, Subcommand};
+use std::io::{stdin, stdout};
 use std::{env, fs, io::Write, path::Path};
 extern crate keyring;
 
@@ -23,15 +24,15 @@ fn read_file(path: &str) -> anyhow::Result<String, Error> {
 /// prompt for a value or password
 fn prompt(name: &str, shadowed: bool) -> anyhow::Result<String, Error> {
     print!("{name}: ");
-    std::io::stdout().flush().unwrap();
+    stdout().flush()?;
 
     if shadowed {
         let value = rpassword::read_password()?;
         Ok(value)
     } else {
         let mut line = String::new();
-        std::io::stdin().read_line(&mut line)?;
-        let value = line.trim().to_string();
+        stdin().read_line(&mut line)?;
+        let value = line.trim().to_owned();
         Ok(value)
     }
 }
@@ -123,8 +124,8 @@ mod tests {
             entry.delete_credential().unwrap();
         }
         let password = "password";
-        entry.set_password(password).unwrap();
-        let p = entry.get_password().unwrap();
+        entry.set_password(password).expect("Can't set password");
+        let p = entry.get_password().expect("Can't get password");
         assert_eq!(p, password);
         entry.delete_credential().unwrap();
     }
