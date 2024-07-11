@@ -5,6 +5,10 @@ authors = ["Andreas Vilinski<vilinski@yahoo.de>"]
 edition = "2024"
 description = "NuGet Credentials utility. Replaces `CI_ARTIFACTORY_USER` and `CI_ARTIFACTORY_USER_PASS` placeholders in NuGet.Conf and NuGet.Conf.Debug with your credentials and saves them securely for reuse"
 readme = "README.md"
+categories = ["command-line-utilities", "development-tools"]
+keywords = ["nuget", "credentials"]
+repository = "github.com/vilinski/nucr"
+license = "MIT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -13,3 +17,29 @@ anyhow = "1"
 rpassword = "7"
 keyring = "3"
 clap = { version = "4", features = ["derive"] }
+[lints]
+
+[lints.rust]
+unsafe_code = "deny"
+unused_crate_dependencies = "deny"
+missing_docs = "deny"
+
+[lints.clippy]
+#all = { level = "deny", priority = -2 }
+cargo = { level = "deny", priority = -1 }
+correctness =  { level = "deny", priority = -1 }
+complexity =  { level = "deny", priority = -1 }
+pedantic =  { level = "deny", priority = -1 }
+perf =  { level = "deny", priority = -1 }
+style =  { level = "deny", priority = -1 }
+suspicious =  { level = "deny", priority = -1 }
+nursery = { level = "deny", priority = -1 }
+#restriction = { level = "deny", priority = -1 }
+multiple_crate_versions = "allow"
+undocumented_unsafe_blocks = "deny"
+
+[profile.release]
+strip = true     # Automatically strip symbols from the binary.
+opt-level = "z"  # Optimize for size.
+lto = true       # Enable link-time optimization.
+codegen-units = 1 # Use a single codegen unit to reduce binary size.

@@ -1,3 +1,5 @@
+//! # nucr
+//! `NuGet` credentials manager
 use anyhow::{Context, Error, ensure};
 use clap::{Parser, Subcommand};
 use std::io::{stdin, stdout};
@@ -41,13 +43,12 @@ fn prompt(name: &str, shadowed: bool) -> anyhow::Result<String, Error> {
 fn get_or_set(username: &str, shadowed: bool) -> anyhow::Result<String, Error> {
     let entry = keyring::Entry::new("nucr", username)?;
     let p = entry.get_password();
-    match p {
-        Ok(p) => Ok(p),
-        _ => {
-            let value = prompt(username, shadowed)?;
-            entry.set_password(&value)?;
-            Ok(value)
-        }
+    if let Ok(p) = p {
+        Ok(p)
+    } else {
+        let value = prompt(username, shadowed)?;
+        entry.set_password(&value)?;
+        Ok(value)
     }
 }
 
@@ -94,7 +95,7 @@ fn replace(path: &str) -> Result<(), Error> {
     } else {
         fs::write(path, new_data)?;
         println!("Credentials are set to {path}");
-    };
+    }
     Ok(())
 }
 
@@ -110,7 +111,7 @@ fn undo(path: &str) -> Result<(), Error> {
     } else {
         fs::write(path, new_data)?;
         println!("Credentials are removed from {path}");
-    };
+    }
     Ok(())
 }
 
