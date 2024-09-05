@@ -71,7 +71,7 @@ fn forget() -> Result<(), Error> {
     for name in &["CI_USER", "CI_USER_PASSWORD"] {
         let entry = keyring::Entry::new("nucr", name)?;
         if entry.get_password().is_ok() {
-            entry.delete_password()?;
+            entry.delete_credential()?;
             println!("{name} deleted");
         } else {
             println!("{name} not found");
@@ -119,13 +119,13 @@ mod tests {
         let entry = keyring::Entry::new("unittest_nucr", "CI_USER").unwrap();
         let p = entry.get_password();
         if p.is_ok() {
-            entry.delete_password().unwrap();
+            entry.delete_credential().unwrap();
         }
         let password = "password";
         entry.set_password(password).unwrap();
         let p = entry.get_password().unwrap();
         assert_eq!(p, password);
-        entry.delete_password().unwrap();
+        entry.delete_credential().unwrap();
     }
 }
 

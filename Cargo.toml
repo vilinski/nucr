@@ -1,6 +1,6 @@
 [package]
 name = "nucr"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Andreas Vilinski<vilinski@yahoo.de>"]
 edition = "2021"
 description = "NuGet Credentials utility. Replaces `CI_ARTIFACTORY_USER` and `CI_ARTIFACTORY_USER_PASS` placeholders in NuGet.Conf and NuGet.Conf.Debug with your credentials and saves them securely for reuse"
@@ -11,5 +11,5 @@ readme = "README.md"
 [dependencies]
 anyhow = "1"
 rpassword = "7"
-keyring = "2"
+keyring = "3"
 clap = { version = "4", features = ["derive"] }
