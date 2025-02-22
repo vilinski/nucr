@@ -40,12 +40,13 @@ fn prompt(name: &str, shadowed: bool) -> anyhow::Result<String, Error> {
 fn get_or_set(username: &str, shadowed: bool) -> anyhow::Result<String, Error> {
     let entry = keyring::Entry::new("nucr", username)?;
     let p = entry.get_password();
-    if let Ok(p) = p {
-        Ok(p)
-    } else {
-        let value = prompt(username, shadowed)?;
-        entry.set_password(&value)?;
-        Ok(value)
+    match p {
+        Ok(p) => Ok(p),
+        _ => {
+            let value = prompt(username, shadowed)?;
+            entry.set_password(&value)?;
+            Ok(value)
+        }
     }
 }
 
