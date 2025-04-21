@@ -1,4 +1,4 @@
-use anyhow::{ensure, Context, Error};
+use anyhow::{Context, Error, ensure};
 use clap::{Parser, Subcommand};
 use std::{env, fs, io::Write, path::Path};
 extern crate keyring;
@@ -16,7 +16,7 @@ fn read_file(path: &str) -> anyhow::Result<String, Error> {
             cwd.display()
         )
     })?;
-    ensure!(!data.is_empty(), "NuGet.Conf file found but is empty");
+    ensure!(!data.is_empty(), "NuGet.Config file found but is empty");
     Ok(data)
 }
 
