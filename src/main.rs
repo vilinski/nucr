@@ -70,6 +70,7 @@ enum Commands {
     Forget,
 }
 
+/// Deletes the saved credentials from the keyring
 fn forget() -> Result<(), Error> {
     for name in &["CI_USER", "CI_USER_PASSWORD"] {
         let entry = keyring::Entry::new("nucr", name)?;
@@ -83,6 +84,7 @@ fn forget() -> Result<(), Error> {
     Ok(())
 }
 
+/// Replaces the credentials in the NuGet.Config file with the values from the keyring
 fn replace(path: &str) -> Result<(), Error> {
     let nuget_config = read_file(path)?;
     let user = get_or_set("CI_USER", false)?;
@@ -99,6 +101,7 @@ fn replace(path: &str) -> Result<(), Error> {
     Ok(())
 }
 
+/// Replaces the credentials in the NuGet.Config file back with the placeholders
 fn undo(path: &str) -> Result<(), Error> {
     let nuget_config = read_file(path)?;
     let user = get_or_set("CI_USER", false)?;
@@ -113,23 +116,6 @@ fn undo(path: &str) -> Result<(), Error> {
         println!("Credentials are removed from {path}");
     }
     Ok(())
-}
-
-mod tests {
-
-    #[test]
-    fn test_get_or_set_var() {
-        let entry = keyring::Entry::new("unittest_nucr", "CI_USER").unwrap();
-        let p = entry.get_password();
-        if p.is_ok() {
-            entry.delete_credential().unwrap();
-        }
-        let password = "password";
-        entry.set_password(password).expect("Can't set password");
-        let p = entry.get_password().expect("Can't get password");
-        assert_eq!(p, password);
-        entry.delete_credential().unwrap();
-    }
 }
 
 /// main function
@@ -158,4 +144,24 @@ fn main() -> anyhow::Result<(), Error> {
     }
 
     Ok(())
+}
+
+/// Unit tests for the nucr application
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_get_or_set_var() {
+        let entry = keyring::Entry::new("unittest_nucr", "CI_USER").unwrap();
+        let p = entry.get_password();
+        if p.is_ok() {
+            entry.delete_credential().unwrap();
+        }
+        let password = "password";
+        entry.set_password(password).expect("Can't set password");
+        let p = entry.get_password().expect("Can't get password");
+        assert_eq!(p, password);
+        entry.delete_credential().unwrap();
+    }
 }
