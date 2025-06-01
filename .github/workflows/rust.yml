@@ -12,17 +12,21 @@ env:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - os: macos-latest
+            target: x86_64-apple-darwin
+          - os: macos-latest
+            target: aarch64-apple-darwin
+    runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v4
 
-    - name: Install system dependencies
-      run: |
-        sudo apt update
-        sudo apt install -y libdbus-1-dev pkg-config dbus dbus-x11
-
     - name: Install Rust
       uses: dtolnay/rust-toolchain@stable
+      with:
+        targets: ${{ matrix.target }}
 
     - name: Cache cargo dependencies
       uses: actions/cache@v4
@@ -32,16 +36,13 @@ jobs:
           ~/.cargo/git
           ~/.cargo/bin
           target
-        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        key: ${{ matrix.os }}-${{ matrix.target }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
     - name: Install cargo-nextest
       run: cargo install cargo-nextest --locked
+
     - name: Run tests
-      run: |
-        # Start D-Bus session and run tests in the same shell context
-        eval $(dbus-launch --sh-syntax)
-        export DBUS_SESSION_BUS_ADDRESS
-        cargo nextest run --verbose
+      run: cargo nextest run --verbose --target ${{ matrix.target }}
 
   build:
     name: Build for ${{ matrix.os }}
