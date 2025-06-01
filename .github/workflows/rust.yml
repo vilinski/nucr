@@ -20,31 +20,34 @@ jobs:
       run: |
         sudo apt update
         sudo apt install -y libdbus-1-dev pkg-config dbus dbus-x11
-        
+
     - name: Install Rust
       uses: dtolnay/rust-toolchain@stable
-        
+
     - name: Setup D-Bus session
       run: |
         # Start D-Bus session for keyring tests
         dbus-launch --sh-syntax > /tmp/dbus-env
         source /tmp/dbus-env
         export DBUS_SESSION_BUS_ADDRESS
-        
+
     - name: Cache cargo dependencies
       uses: actions/cache@v4
       with:
         path: |
           ~/.cargo/registry
           ~/.cargo/git
+          ~/.cargo/bin
           target
         key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-        
+
+    - name: Install dependencies
+      run: cargo install cargo-nextest --locked
     - name: Run tests
       run: |
         source /tmp/dbus-env 2>/dev/null || true
         export DBUS_SESSION_BUS_ADDRESS
-        cargo test --verbose
+        cargo nextest run --verbose
 
   build:
     name: Build for ${{ matrix.os }}
