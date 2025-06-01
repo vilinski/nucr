@@ -12,20 +12,28 @@ env:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
     - uses: actions/checkout@v4
 
-    - name: Install system dependencies
-      run: |
-        sudo apt update
-        sudo apt install -y libdbus-1-dev pkg-config
-        
     - name: Install Rust
       uses: dtolnay/rust-toolchain@stable
-        
+
+    - name: Cache cargo dependencies
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          ~/.cargo/bin
+          target
+        key: macos-latest-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+    - name: Install cargo-nextest
+      run: cargo install cargo-nextest --locked
+
     - name: Run tests
-      run: cargo test --verbose
+      run: cargo nextest run --verbose
 
   build:
     name: Build for ${{ matrix.os }}

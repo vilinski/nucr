@@ -166,16 +166,24 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_get_or_set_var() {
-        let entry = keyring::Entry::new("unittest_nucr", "CI_USER").unwrap();
-        let p = entry.get_password();
-        if p.is_ok() {
-            entry.delete_credential().unwrap();
-        }
-        let password = "password";
-        entry.set_password(password).expect("Can't set password");
-        let p = entry.get_password().expect("Can't get password");
-        assert_eq!(p, password);
-        entry.delete_credential().unwrap();
+    fn test_get_or_set_var() -> Result<(), keyring::Error> {
+        let entry = keyring::Entry::new("unittest_nucr", "CI_USER")?;
+        
+        // Clean up any existing entry first
+        let _ = entry.delete_credential();
+        
+        let password = "test_password_123";
+        
+        // Set password
+        entry.set_password(password)?;
+        
+        // Verify we can retrieve the password
+        let retrieved_password = entry.get_password()?;
+        assert_eq!(retrieved_password, password);
+        
+        // Clean up
+        let _ = entry.delete_credential();
+        
+        Ok(())
     }
 }
