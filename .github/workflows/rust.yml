@@ -24,13 +24,6 @@ jobs:
     - name: Install Rust
       uses: dtolnay/rust-toolchain@stable
 
-    - name: Setup D-Bus session
-      run: |
-        # Start D-Bus session for keyring tests
-        dbus-launch --sh-syntax > /tmp/dbus-env
-        source /tmp/dbus-env
-        export DBUS_SESSION_BUS_ADDRESS
-
     - name: Cache cargo dependencies
       uses: actions/cache@v4
       with:
@@ -41,11 +34,12 @@ jobs:
           target
         key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
-    - name: Install dependencies
+    - name: Install cargo-nextest
       run: cargo install cargo-nextest --locked
     - name: Run tests
       run: |
-        source /tmp/dbus-env 2>/dev/null || true
+        # Start D-Bus session and run tests in the same shell context
+        eval $(dbus-launch --sh-syntax)
         export DBUS_SESSION_BUS_ADDRESS
         cargo nextest run --verbose
 
