@@ -52,6 +52,18 @@ fn get_or_set(username: &str, shadowed: bool) -> anyhow::Result<String, Error> {
     }
 }
 
+fn update_git_index(file_path: &str, assume_unchanged: bool) {
+    let flag = if assume_unchanged {
+        "--assume-unchanged"
+    } else {
+        "--no-assume-unchanged"
+    };
+
+    let _ = std::process::Command::new("git")
+        .args(["update-index", flag, file_path])
+        .output();
+}
+
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
 struct Cli {
@@ -96,6 +108,7 @@ fn replace(path: &str) -> Result<(), Error> {
         println!("Credentials are already set to {path}");
     } else {
         fs::write(path, new_data)?;
+        update_git_index(path, true);
         println!("Credentials are set to {path}");
     }
     Ok(())
@@ -113,6 +126,7 @@ fn undo(path: &str) -> Result<(), Error> {
         println!("No credentials to remove from {path}");
     } else {
         fs::write(path, new_data)?;
+        update_git_index(path, true);
         println!("Credentials are removed from {path}");
     }
     Ok(())
