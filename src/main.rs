@@ -174,33 +174,14 @@ mod tests {
         
         let password = "test_password_123";
         
-        // Set password with better error handling
-        match entry.set_password(password) {
-            Ok(_) => {
-                // Verify we can retrieve the password
-                match entry.get_password() {
-                    Ok(retrieved_password) => {
-                        assert_eq!(retrieved_password, password);
-                        // Clean up
-                        let _ = entry.delete_credential();
-                    }
-                    Err(e) => {
-                        // Clean up on failure
-                        let _ = entry.delete_credential();
-                        panic!("Failed to retrieve password: {}", e);
-                    }
-                }
-            }
-            Err(e) => {
-                // Skip test if keyring is not available (e.g., in some CI environments)
-                if e.to_string().contains("No such interface") || 
-                   e.to_string().contains("SecretService") ||
-                   e.to_string().contains("DBus") {
-                    eprintln!("Skipping keyring test - secret service not available: {}", e);
-                    return;
-                }
-                panic!("Failed to set password: {}", e);
-            }
-        }
+        // Set password
+        entry.set_password(password).unwrap();
+        
+        // Verify we can retrieve the password
+        let retrieved_password = entry.get_password().unwrap();
+        assert_eq!(retrieved_password, password);
+        
+        // Clean up
+        let _ = entry.delete_credential();
     }
 }
