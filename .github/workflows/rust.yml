@@ -19,7 +19,7 @@ jobs:
     - name: Install system dependencies
       run: |
         sudo apt update
-        sudo apt install -y libdbus-1-dev pkg-config dbus
+        sudo apt install -y libdbus-1-dev pkg-config dbus dbus-x11
         
     - name: Install Rust
       uses: dtolnay/rust-toolchain@stable
