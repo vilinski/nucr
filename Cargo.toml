@@ -1,6 +1,6 @@
 [package]
 name = "nucr"
-version = "0.2.0"
+version = "1.0.0"
 authors = ["Andreas Vilinski <vilinski@yahoo.de>"]
 edition = "2024"
 description = "NuGet Credentials utility. Replaces `CI_ARTIFACTORY_USER` and `CI_ARTIFACTORY_USER_PASS` placeholders in NuGet.Conf and NuGet.Conf.Debug with your credentials and saves them securely for reuse"
@@ -17,6 +17,9 @@ anyhow = "1"
 rpassword = "7"
 keyring = { version = "3", features = ["apple-native", "windows-native", "sync-secret-service"] }
 clap = { version = "4", features = ["derive"] }
+
+[dev-dependencies]
+tempfile = "3"
 
 [lints.rust]
 unsafe_code = "deny"
@@ -42,3 +45,11 @@ strip = true     # Automatically strip symbols from the binary.
 opt-level = "z"  # Optimize for size.
 lto = true       # Enable link-time optimization.
 codegen-units = 1 # Use a single codegen unit to reduce binary size.
+
+[profile.test]
+debug = true
+opt-level = 0
+overflow-checks = false
+lto = false
+incremental = false
+codegen-units = 1
