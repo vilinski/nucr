@@ -71,7 +71,7 @@ fn get_or_set_credential<K: Keyring>(keyring: &K, key: &str, is_password: bool) 
         let value = prompt(key, is_password)?;
         keyring
             .set_password("nucr", key, &value)
-            .map_err(|e| anyhow!("Failed to store credential: {}", e))?;
+            .map_err(|e| anyhow!("Failed to store credential: {e}"))?;
         Ok(value)
     }
 }
