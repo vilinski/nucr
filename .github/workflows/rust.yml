@@ -65,7 +65,7 @@ jobs:
       run: cargo nextest run --verbose
 
   build:
-    name: Build for ${{ matrix.os }}
+    name: Build for ${{ matrix.target }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -76,7 +76,7 @@ jobs:
           - os: windows-latest
             target: x86_64-pc-windows-msvc
             binary-suffix: ".exe"
-          - os: macos-13
+          - os: macos-latest
             target: x86_64-apple-darwin
             binary-suffix: ""
           - os: macos-latest
