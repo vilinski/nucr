@@ -15,7 +15,7 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
 
     - name: Install Rust
       uses: dtolnay/rust-toolchain@stable
@@ -23,7 +23,7 @@ jobs:
         components: rustfmt, clippy
 
     - name: Cache cargo dependencies
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       with:
         path: |
           ~/.cargo/registry
@@ -40,13 +40,13 @@ jobs:
   test:
     runs-on: macos-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
 
     - name: Install Rust
       uses: dtolnay/rust-toolchain@stable
 
     - name: Cache cargo dependencies
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       with:
         path: |
           ~/.cargo/registry
@@ -65,7 +65,7 @@ jobs:
       run: cargo nextest run --verbose
 
   build:
-    name: Build for ${{ matrix.os }}
+    name: Build for ${{ matrix.target }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -76,21 +76,15 @@ jobs:
           - os: windows-latest
             target: x86_64-pc-windows-msvc
             binary-suffix: ".exe"
-          - os: macos-x86_64
+          - os: macos-latest
             target: x86_64-apple-darwin
             binary-suffix: ""
-          - os: macos-aarch64
+          - os: macos-latest
             target: aarch64-apple-darwin
             binary-suffix: ""
 
     steps:
-    - uses: actions/checkout@v4
-
-    - name: Install system dependencies (Linux)
-      if: matrix.os == 'ubuntu-latest'
-      run: |
-        sudo apt update
-        sudo apt install -y libdbus-1-dev pkg-config
+    - uses: actions/checkout@v7
 
     - name: Install Rust
       uses: dtolnay/rust-toolchain@stable
@@ -104,14 +98,10 @@ jobs:
       shell: bash
       run: |
         mkdir -p artifacts
-        if [ "${{ matrix.target }}" = "aarch64-apple-darwin" ]; then
-          cp target/${{ matrix.target }}/release/nucr${{ matrix.binary-suffix }} artifacts/nucr-${{ matrix.target }}${{ matrix.binary-suffix }}
-        else
-          cp target/${{ matrix.target }}/release/nucr${{ matrix.binary-suffix }} artifacts/nucr-${{ matrix.target }}${{ matrix.binary-suffix }}
-        fi
+        cp target/${{ matrix.target }}/release/nucr${{ matrix.binary-suffix }} artifacts/nucr-${{ matrix.target }}${{ matrix.binary-suffix }}
 
     - name: Upload artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: nucr-${{ matrix.target }}
         path: artifacts/nucr-${{ matrix.target }}${{ matrix.binary-suffix }}
@@ -125,20 +115,19 @@ jobs:
       contents: write
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
 
     - name: Download all artifacts
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v8
       with:
         path: artifacts
 
     - name: Create release
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v3
       with:
         files: |
           artifacts/*/nucr-*
         generate_release_notes: true
         draft: false
         prerelease: false
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        token: ${{ secrets.GITHUB_TOKEN }}
