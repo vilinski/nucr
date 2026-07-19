@@ -36,6 +36,16 @@ curl -L https://github.com/vilinski/nucr/releases/latest/download/nucr-aarch64-a
 Invoke-WebRequest -Uri "https://github.com/vilinski/nucr/releases/latest/download/nucr-x86_64-pc-windows-msvc.exe" -OutFile "nucr.exe"
 ```
 
+### From Source (Local Checkout)
+
+```bash
+git clone https://github.com/vilinski/nucr
+cd nucr
+cargo install --path .
+```
+
+Builds and installs from your local checkout into `~/.cargo/bin`, including any uncommitted changes. Useful when developing or testing changes before pushing. Add `--force` to overwrite an existing install.
+
 ## Usage
 
 ### Basic Commands
